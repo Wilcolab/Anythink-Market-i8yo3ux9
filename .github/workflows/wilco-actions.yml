@@ -22,9 +22,6 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Set Docker API version
-        run: echo "DOCKER_API_VERSION=1.40" >> $GITHUB_ENV
-
       - name: Wilco checks
         id: Wilco
         uses: trywilco/actions@main
