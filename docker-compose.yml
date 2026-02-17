@@ -4,27 +4,21 @@ services:
   python-server:
     build:
       context: ./python-server
-      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./python-server/src:/app/src
 
   node-server:
     build:
       context: ./anythink-express-server
-      dockerfile: Dockerfile
     ports:
       - "8001:8001"
     volumes:
       - ./anythink-express-server:/app
     command: yarn start
-  healthcheck:
-  test:
-    [
-      "CMD-SHELL",
-      "node -e \"require('http').get('http://localhost:8001', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""
-    ]
-  interval: 5s
-  timeout: 3s
-  retries: 5
+    # We use a Node script for the check because 'curl' isn't in the image
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8001', (res) => res.statusCode === 200 ? process.exit(0) : process.exit(1))"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+      start_period: 5s # Gives yarn start time to breathe before checking
