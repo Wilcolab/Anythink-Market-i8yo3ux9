@@ -12,4 +12,10 @@ services:
       context: ./anythink-express-server
     ports:
       - "8001:8001"
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=anythink-market
     command: yarn start
