@@ -9,12 +9,6 @@ jobs:
     timeout-minutes: 10
     name: Pr checks
 
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
-
     steps:
       - name: Check out project
         uses: actions/checkout@v2
@@ -23,6 +17,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
+
+      - name: Install MongoDB manually
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mongodb
+          sudo systemctl start mongodb
+          sleep 5
 
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
