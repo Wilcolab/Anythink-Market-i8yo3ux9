@@ -18,4 +18,4 @@ services:
       - "8001:8001"
     volumes:
       - ./anythink-express-server:/app
-    command: yarn start
+    command: node src/app.js
