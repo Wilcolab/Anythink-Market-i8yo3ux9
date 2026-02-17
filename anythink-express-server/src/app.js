@@ -51,6 +51,16 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Error handling for unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
 // Graceful shutdown handler
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
