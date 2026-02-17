@@ -41,6 +41,31 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Install npm dependencies
+        run: cd anythink-express-server && npm ci
+
+      - name: Start Docker Compose services
+        run: docker compose up -d
+
+      - name: Wait for Node server to be healthy
+        run: |
+          timeout=60
+          elapsed=0
+          interval=2
+          while [ $elapsed -lt $timeout ]; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8001/ || echo "000")
+            if [ "$response" = "200" ]; then
+              echo "Server is healthy"
+              exit 0
+            fi
+            echo "Waiting for server... (response: $response)"
+            sleep $interval
+            elapsed=$((elapsed + interval))
+          done
+          echo "Server failed to respond with 200 after ${timeout}s"
+          docker compose logs
+          exit 1
+
       - name: Wilco checks
         id: Wilco
         uses: trywilco/actions@main

@@ -1,9 +1,52 @@
+version: "3.8"
+
 services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: anythink-market
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   python-server:
     build:
       context: ./python-server
-      dockerfile: Dockerfile
     ports:
-      - 8000:8000
-    volumes:
-      - ./python-server/src:/app/src
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  node-server:
+    build:
+      context: ./anythink-express-server
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=anythink-market
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm start
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8001/health', (res) => { if (res.statusCode !== 200) throw new Error(res.statusCode) })"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres_data:
