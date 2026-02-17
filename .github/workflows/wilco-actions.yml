@@ -18,14 +18,12 @@ jobs:
         with:
           node-version: "16"
 
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.6.0
-        with:
-          mongodb-version: "4.4"
-
       - uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
+
+      - name: Set Docker API version
+        run: echo "DOCKER_API_VERSION=1.40" >> $GITHUB_ENV
 
       - name: Wilco checks
         id: Wilco
